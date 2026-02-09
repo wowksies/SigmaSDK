@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIGMA SDK | Premium RL Framework</title>
+    <title>SIGMA SDK | The Future of Automation</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         /* --- CORE VARIABLES --- */
         :root {
-            --bg-color: #050505;
-            --surface-color: #0f0f0f;
+            --bg-color: #030303;
+            --surface: #0a0a0a;
+            --surface-highlight: #121212;
             --accent-red: #d90429;
             --accent-glow: #ff0f39;
-            --text-main: #f0f0f0;
-            --text-dim: #888;
+            --text-main: #ffffff;
+            --text-dim: #888888;
             --font-mono: 'JetBrains Mono', monospace;
             --font-display: 'Space Grotesk', sans-serif;
         }
@@ -28,315 +30,400 @@
             color: var(--text-main);
             font-family: var(--font-display);
             overflow-x: hidden;
-            min-height: 100vh;
+            line-height: 1.6;
         }
 
-        /* --- BACKGROUND FX --- */
+        /* --- FX LAYERS --- */
         .noise {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: url('https://grainy-gradients.vercel.app/noise.svg');
-            opacity: 0.05; pointer-events: none; z-index: 900;
+            opacity: 0.04; pointer-events: none; z-index: 998;
         }
-
-        .scanlines {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
-            background-size: 100% 4px; pointer-events: none; z-index: 901;
-        }
-
-        .glow-spot {
-            position: fixed; top: -20%; left: 50%; transform: translateX(-50%);
-            width: 800px; height: 800px;
-            background: radial-gradient(circle, rgba(217, 4, 41, 0.15) 0%, transparent 70%);
-            pointer-events: none; z-index: 0;
-        }
-
-        /* --- UI COMPONENTS --- */
-        .container { max-width: 1400px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 10; }
-        .mono { font-family: var(--font-mono); }
-        .text-red { color: var(--accent-glow); text-shadow: 0 0 15px rgba(255, 15, 57, 0.4); }
         
-        .btn {
-            background: transparent; border: 1px solid var(--accent-red);
-            color: var(--accent-glow); padding: 1rem 3rem;
-            font-family: var(--font-mono); font-weight: bold; cursor: pointer;
-            transition: 0.3s; text-transform: uppercase; letter-spacing: 2px;
-            position: relative; overflow: hidden;
+        .grid-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(255, 15, 57, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 15, 57, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px; z-index: -1;
+            mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
         }
-        .btn:hover { background: var(--accent-red); color: #000; box-shadow: 0 0 30px var(--accent-red); }
 
-        /* --- HEADER --- */
+        /* --- UTILITY CLASSES --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 10; }
+        .mono { font-family: var(--font-mono); }
+        .text-red { color: var(--accent-glow); text-shadow: 0 0 15px rgba(255, 15, 57, 0.5); }
+        .text-center { text-align: center; }
+        
+        /* --- NAVIGATION --- */
         nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 2rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 1.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 1000; background: rgba(3,3,3,0.8);
         }
-        .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; }
 
-        /* --- HERO & INJECTION SEQUENCE --- */
+        .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; display: flex; align-items: center; gap: 10px; }
+        .dev-tag { font-size: 0.7rem; color: var(--text-dim); background: #111; padding: 2px 8px; border-radius: 4px; border: 1px solid #222; }
+
+        .discord-btn {
+            background: #5865F2; color: #fff; text-decoration: none;
+            padding: 0.6rem 1.2rem; border-radius: 4px; font-weight: bold; font-size: 0.9rem;
+            display: flex; align-items: center; gap: 8px; transition: 0.3s;
+            font-family: var(--font-mono);
+        }
+        .discord-btn:hover { background: #4752c4; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(88, 101, 242, 0.3); }
+
+        /* --- HERO SECTION --- */
         .hero {
-            min-height: 85vh; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; text-align: center;
+            padding: 8rem 0 6rem;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        .hero h1 { font-size: 5rem; line-height: 0.9; margin-bottom: 1.5rem; text-transform: uppercase; }
-        .hero p { font-family: var(--font-mono); color: var(--text-dim); max-width: 600px; margin-bottom: 3rem; }
-
-        /* TERMINAL LOADER */
-        #terminal {
-            display: none; width: 500px; background: #000; border: 1px solid #333;
-            padding: 1rem; font-family: var(--font-mono); font-size: 0.8rem;
-            text-align: left; height: 300px; overflow-y: auto;
-            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+        .hero h1 {
+            font-size: 5rem; line-height: 0.95; margin-bottom: 1.5rem; text-transform: uppercase;
+            background: linear-gradient(to bottom right, #fff, #666);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-align: center;
         }
-        .log-line { margin-bottom: 4px; display: block; }
-        .log-success { color: #0f0; }
-        .log-warn { color: #fc0; }
-
-        /* INJECTOR PREVIEW */
-        #injector-preview {
-            display: none; width: 400px;
-            box-shadow: 0 0 50px rgba(217, 4, 41, 0.3);
-            border: 1px solid var(--accent-red);
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        
+        .hero p {
+            font-size: 1.2rem; color: var(--text-dim); max-width: 700px; text-align: center; margin-bottom: 3rem;
         }
 
-        /* ACTUAL MENU */
-        #main-interface {
-            display: none; opacity: 0;
-            width: 900px; height: 550px;
-            position: relative; margin: 0 auto;
-            perspective: 1000px;
-            transition: opacity 1s ease;
+        .cta-group { display: flex; gap: 20px; margin-bottom: 4rem; }
+
+        .btn-primary {
+            background: var(--accent-red); color: #fff; border: none;
+            padding: 1rem 3rem; font-family: var(--font-mono); font-weight: bold;
+            text-transform: uppercase; cursor: pointer; letter-spacing: 1px;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            transition: 0.3s; position: relative; overflow: hidden;
+        }
+        .btn-primary:hover { background: var(--accent-glow); box-shadow: 0 0 40px rgba(217, 4, 41, 0.4); }
+        
+        .btn-secondary {
+            background: transparent; border: 1px solid #333; color: var(--text-dim);
+            padding: 1rem 2rem; font-family: var(--font-mono); font-weight: bold;
+            text-transform: uppercase; cursor: pointer; transition: 0.3s;
+            text-decoration: none; display: flex; align-items: center;
+        }
+        .btn-secondary:hover { border-color: #fff; color: #fff; }
+
+        /* --- INTERACTIVE DEMO (Injector & Menu) --- */
+        .demo-wrapper {
+            width: 100%; max-width: 1000px; margin: 0 auto 8rem;
+            perspective: 1500px; min-height: 600px; display: flex; justify-content: center; align-items: center;
         }
 
-        .draggable-window {
-            position: absolute; width: 100%; height: 100%;
-            background: #111; border: 1px solid #333;
-            display: flex; flex-direction: column;
-            box-shadow: 0 20px 80px rgba(0,0,0,0.9);
+        /* Terminal */
+        .terminal-box {
+            width: 600px; background: #000; border: 1px solid #333;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8); padding: 10px;
+            font-family: var(--font-mono); font-size: 0.85rem; display: none;
+        }
+        .term-header { background: #111; padding: 5px 10px; margin-bottom: 10px; display: flex; gap: 6px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #333; }
+        .term-content { height: 300px; overflow-y: auto; color: #ccc; padding: 10px; }
+        .log-ok { color: #2ecc71; }
+
+        /* Menu Window */
+        .menu-window {
+            width: 900px; height: 550px; background: #0f0f0f;
+            border: 1px solid #222; border-top: 3px solid var(--accent-red);
+            position: absolute; display: none; opacity: 0;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.9);
             border-radius: 6px; overflow: hidden;
-            left: 0; top: 0;
-        }
-
-        .window-header {
-            background: #181818; padding: 10px 15px; border-bottom: 1px solid #252525;
-            display: flex; justify-content: space-between; align-items: center;
-            cursor: grab;
-        }
-        .window-header:active { cursor: grabbing; }
-
-        .window-body { display: flex; height: 100%; }
-        
-        .sidebar {
-            width: 180px; background: #141414; border-right: 1px solid #252525;
-            padding: 1rem 0; display: flex; flex-direction: column;
+            transition: opacity 0.8s ease;
         }
         
-        .sidebar button {
-            background: none; border: none; color: #666; padding: 12px 20px;
-            text-align: left; font-family: var(--font-mono); cursor: pointer;
-            transition: 0.2s; position: relative;
+        .menu-header {
+            background: #181818; padding: 12px 20px; cursor: grab;
+            display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222;
         }
-        .sidebar button:hover { color: #fff; background: #1f1f1f; }
-        .sidebar button.active { color: var(--accent-glow); background: rgba(217, 4, 41, 0.05); border-left: 2px solid var(--accent-red); }
+        .menu-header:active { cursor: grabbing; }
 
-        .content-area {
-            flex-grow: 1; background: #080808; position: relative;
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden;
-        }
+        .menu-body { display: flex; height: 100%; }
 
-        .menu-img {
-            max-width: 100%; max-height: 100%;
-            object-fit: contain; /* Ensures high quality scaling */
-            opacity: 0; transition: opacity 0.3s;
+        .sidebar { width: 200px; background: #121212; border-right: 1px solid #222; padding-top: 20px; }
+        .menu-tab {
+            width: 100%; padding: 15px 25px; background: none; border: none;
+            color: #666; font-family: var(--font-mono); text-align: left;
+            cursor: pointer; transition: 0.2s; position: relative;
         }
+        .menu-tab:hover { color: #fff; background: #1a1a1a; }
+        .menu-tab.active { color: var(--accent-glow); background: rgba(217, 4, 41, 0.05); border-left: 3px solid var(--accent-red); }
+
+        .menu-viewport { flex-grow: 1; background: #050505; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+        .menu-viewport img { width: 100%; height: 100%; object-fit: contain; }
+
+        /* --- FEATURES GRID --- */
+        .features-section { margin-bottom: 8rem; }
+        .section-header { margin-bottom: 4rem; text-align: center; }
+        .section-header h2 { font-size: 3rem; margin-bottom: 1rem; }
         
-        /* --- MEDIA SECTION --- */
-        .media-section { margin-top: 8rem; padding-bottom: 4rem; }
-        .section-title { font-size: 2rem; margin-bottom: 2rem; border-left: 4px solid var(--accent-red); padding-left: 1rem; }
-        
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
-        
-        .video-container {
-            position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;
-            border: 1px solid #333; background: #000;
-            transition: 0.3s;
+        .features-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;
         }
-        .video-container:hover { border-color: var(--accent-red); box-shadow: 0 0 30px rgba(217, 4, 41, 0.1); }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 
-        .img-card {
-            height: 300px; border: 1px solid #333; overflow: hidden; position: relative;
+        .feature-card {
+            background: var(--surface); border: 1px solid #1a1a1a; padding: 2.5rem;
+            transition: 0.3s; position: relative; overflow: hidden;
         }
-        .img-card img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; opacity: 0.7; }
-        .img-card:hover img { transform: scale(1.05); opacity: 1; }
+        .feature-card:hover { border-color: var(--accent-red); transform: translateY(-5px); }
+        .feature-card i { font-size: 2rem; color: var(--accent-glow); margin-bottom: 1.5rem; }
+        .feature-card h3 { font-size: 1.5rem; margin-bottom: 1rem; }
+        .feature-card p { color: var(--text-dim); font-size: 0.95rem; }
 
-        /* Animation Keyframes */
-        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        /* --- MEDIA SHOWCASE --- */
+        .media-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 8rem; }
+        
+        .media-item { border: 1px solid #222; position: relative; height: 350px; overflow: hidden; background: #000; }
+        .media-item iframe { width: 100%; height: 100%; border: none; }
+        .media-item img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: 0.5s; }
+        .media-item:hover img { opacity: 1; transform: scale(1.05); }
+        .media-label {
+            position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.8);
+            padding: 5px 10px; font-family: var(--font-mono); font-size: 0.8rem; border-left: 2px solid var(--accent-red);
+        }
 
+        /* --- FOOTER --- */
+        footer {
+            border-top: 1px solid #1a1a1a; padding: 4rem 0;
+            text-align: center; background: #020202;
+        }
+        .footer-link { color: var(--text-dim); text-decoration: none; margin: 0 10px; transition: 0.3s; }
+        .footer-link:hover { color: var(--accent-glow); }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3rem; }
+            .menu-window { width: 95%; height: 400px; }
+            .media-grid { grid-template-columns: 1fr; }
+            .sidebar { width: 120px; }
+        }
     </style>
 </head>
 <body>
 
     <div class="noise"></div>
-    <div class="scanlines"></div>
-    <div class="glow-spot"></div>
+    <div class="grid-bg"></div>
 
     <div class="container">
         <nav>
-            <div class="logo">SIGMA <span class="text-red">SDK</span></div>
-            <div class="mono text-dim" style="font-size: 0.8rem;">STATUS: <span style="color:#0f0">UNDETECTED</span></div>
+            <div class="logo">
+                <i class="fa-solid fa-cube text-red"></i> SIGMA SDK
+                <span class="dev-tag">V4.2 STABLE</span>
+            </div>
+            <a href="https://discord.com/users/747411610389446747" target="_blank" class="discord-btn">
+                <i class="fa-brands fa-discord"></i> ADD YOUR BOT
+            </a>
         </nav>
 
-        <div class="hero">
+        <header class="hero">
+            <h4 class="mono text-red" style="margin-bottom: 1rem;">> SYSTEM_OVERRIDE_INITIATED</h4>
+            <h1>The Last SDK<br>You Will Ever Need.</h1>
+            <p>Dominate the competition with the most advanced, undetected automation framework on the market. Engineered by Kayaz.</p>
             
-            <div id="start-screen">
-                <h2 class="mono text-red" style="margin-bottom:1rem;">> READY_TO_INJECT</h2>
-                <h1>NEXT GENERATION<br>AUTOMATION</h1>
-                <p>Advanced heuristics. Cloud-based configs. 0ms Input Lag.</p>
-                <button class="btn" onclick="startInjection()">INITIALIZE SDK</button>
+            <div class="cta-group">
+                <button class="btn-primary" onclick="startInjection()">
+                    <i class="fa-solid fa-terminal"></i> Initialize SDK
+                </button>
+                <a href="#features" class="btn-secondary">Learn More</a>
+            </div>
+        </header>
+
+        <div class="demo-wrapper">
+            
+            <div class="terminal-box" id="terminal">
+                <div class="term-header">
+                    <div class="dot" style="background:#ff5f56"></div>
+                    <div class="dot" style="background:#ffbd2e"></div>
+                    <div class="dot" style="background:#27c93f"></div>
+                    <span style="margin-left: 10px; color: #666;">admin@sigma-sdk:~</span>
+                </div>
+                <div class="term-content" id="term-log"></div>
             </div>
 
-            <div id="terminal"></div>
-
-            <img id="injector-preview" src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Menu/Injector.png" alt="Injector">
-
-            <div id="main-interface">
-                <div class="draggable-window" id="dragWindow">
-                    <div class="window-header" id="dragHeader">
-                        <span class="mono" style="font-size: 0.8rem; font-weight: bold;">SIGMA_SDK // MAIN_THREAD</span>
-                        <div style="width:10px; height:10px; background:var(--accent-red); border-radius:50%; box-shadow: 0 0 5px var(--accent-red);"></div>
+            <div class="menu-window" id="menu-window">
+                <div class="menu-header" id="drag-handle">
+                    <span class="mono" style="font-weight:bold; font-size: 0.9rem;">SIGMA_INTERNAL // MENU</span>
+                    <div class="mono" style="font-size: 0.8rem; color:#666;">INSERT TO HIDE</div>
+                </div>
+                <div class="menu-body">
+                    <div class="sidebar">
+                        <button class="menu-tab active" onclick="switchTab('Home', this)">Home</button>
+                        <button class="menu-tab" onclick="switchTab('Visuals', this)">Visuals</button>
+                        <button class="menu-tab" onclick="switchTab('Injector', this)">Injector</button>
+                        <button class="menu-tab" onclick="switchTab('Matchmaking', this)">Matchmaking</button>
+                        <button class="menu-tab" onclick="switchTab('Humanizer', this)">Humanizer</button>
                     </div>
-                    <div class="window-body">
-                        <div class="sidebar">
-                            <button class="active" onclick="switchTab('Home', this)">Home</button>
-                            <button onclick="switchTab('Visuals', this)">Visuals</button>
-                            <button onclick="switchTab('Injector', this)">Injector</button>
-                            <button onclick="switchTab('Matchmaking', this)">Matchmaking</button>
-                            <button onclick="switchTab('Humanizer', this)">Humanizer</button>
-                        </div>
-                        <div class="content-area">
-                            <img id="menu-display" class="menu-img" src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Menu/Home.png" alt="Menu Content" style="opacity: 1;">
-                        </div>
+                    <div class="menu-viewport">
+                        <img id="menu-img" src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Menu/Home.png" alt="Menu Preview">
                     </div>
                 </div>
-                <p class="mono text-dim" style="margin-top: 1rem; font-size: 0.8rem;">[ MOUSE_1 TO DRAG WINDOW ]</p>
             </div>
 
         </div>
 
-        <div class="media-section">
-            <h3 class="section-title mono">MEDIA_SHOWCASE</h3>
+        <section id="features" class="features-section">
+            <div class="section-header">
+                <h2 class="mono">WHY CHOOSE <span class="text-red">SIGMA</span>?</h2>
+                <p class="mono" style="color:var(--text-dim)">OUTPERFORM. OUTLAST. OUTSMART.</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <h3>100% Undetected</h3>
+                    <p>Our kernel-level driver ensures you stay safe. We haven't had a ban wave in over 2 years. Play on your main account with confidence.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-cloud-arrow-down"></i>
+                    <h3>Cloud Configs</h3>
+                    <p>Access your settings from any PC. Share configs with friends or download pro-player presets instantly from our cloud database.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-bolt"></i>
+                    <h3>0ms Latency</h3>
+                    <p>Optimized C++ architecture ensures no FPS drops. The SDK runs on a separate thread, keeping your game buttery smooth.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="section-header">
+                <h2 class="mono">SEE IT IN <span class="text-red">ACTION</span></h2>
+            </div>
             
-            <div class="grid-2">
-                <div class="video-container">
-                    <iframe src="https://www.youtube.com/embed/W0mwIbr6kM0" title="Sigma Showcase 1" allowfullscreen></iframe>
+            <div class="media-grid">
+                <div class="media-item">
+                    <div class="media-label">SHOWCASE_01.mp4</div>
+                    <iframe src="https://www.youtube.com/embed/W0mwIbr6kM0" allowfullscreen></iframe>
                 </div>
-                <div class="video-container">
-                    <iframe src="https://www.youtube.com/embed/pSBrc2darcs" title="Sigma Showcase 2" allowfullscreen></iframe>
+                <div class="media-item">
+                    <div class="media-label">SHOWCASE_02.mp4</div>
+                    <iframe src="https://www.youtube.com/embed/pSBrc2darcs" allowfullscreen></iframe>
                 </div>
             </div>
 
-            <h3 class="section-title mono" style="margin-top: 3rem;">INGAME_VISUALS</h3>
-            <div class="grid-2">
-                <div class="img-card">
-                    <img src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Ingame/Image1.png" alt="Ingame 1">
-                    <div style="position:absolute; bottom:15px; left:15px; background:black; padding:5px 10px; font-family:var(--font-mono); font-size:0.7rem;">VISUALS_ENABLED</div>
+            <div class="media-grid">
+                <div class="media-item">
+                    <div class="media-label">INGAME_VISUALS_V1</div>
+                    <img src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Ingame/Ingame1.png" alt="ESP Preview">
                 </div>
-                <div class="img-card">
-                    <img src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Ingame/Image2.png" alt="Ingame 2">
-                    <div style="position:absolute; bottom:15px; left:15px; background:black; padding:5px 10px; font-family:var(--font-mono); font-size:0.7rem;">DEBUG_VIEW</div>
+                <div class="media-item">
+                    <div class="media-label">INGAME_DEBUG_LAYER</div>
+                    <img src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Ingame/Ingame2.png" alt="FOV Preview">
                 </div>
             </div>
-        </div>
+        </section>
 
-        <footer style="text-align: center; padding: 2rem; border-top: 1px solid #222; margin-top: 2rem;">
-            <p class="mono text-dim" style="font-size: 0.8rem;">SIGMA SDK © 2026</p>
+        <footer>
+            <div class="logo" style="justify-content: center; margin-bottom: 1rem;">
+                SIGMA SDK
+            </div>
+            <p class="mono" style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">
+                Architected & Designed by <span style="color: #fff;">Kayaz</span>
+            </p>
+            <div>
+                <a href="https://discord.com/users/747411610389446747" class="footer-link">Contact Developer</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+            </div>
+            <p style="margin-top: 2rem; font-size: 0.7rem; color: #333;">
+                DISCLAIMER: For educational purposes only.
+            </p>
         </footer>
+
     </div>
 
     <script>
-        // --- INJECTION SEQUENCE LOGIC ---
-        const startScreen = document.getElementById('start-screen');
-        const terminal = document.getElementById('terminal');
-        const injectorImg = document.getElementById('injector-preview');
-        const mainInterface = document.getElementById('main-interface');
-
+        // --- 1. TERMINAL & INJECTION SEQUENCE ---
         function startInjection() {
-            startScreen.style.display = 'none';
-            terminal.style.display = 'block';
+            const btn = document.querySelector('.btn-primary');
+            const termBox = document.getElementById('terminal');
+            const termLog = document.getElementById('term-log');
+            const menu = document.getElementById('menu-window');
+
+            // Hide menu if open, show terminal
+            menu.style.display = 'none';
+            menu.style.opacity = '0';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> LOADING...';
+            termBox.style.display = 'block';
             
             const logs = [
-                "Connecting to secure server...",
-                "Verifying HWID...",
-                "<span class='log-success'>[OK] HWID Verified</span>",
-                "Downloading cloud configs...",
-                "Mapping memory regions...",
-                "Bypassing integrity checks...",
-                "<span class='log-success'>[SUCCESS] Injected into process (ID: 4522)</span>"
+                "Connecting to Sigma Cloud...",
+                "Authenticating User: Kayaz...",
+                "<span class='log-ok'>[SUCCESS]</span> License Verified (Lifetime)",
+                "Downloading offsets...",
+                "Mapping memory driver...",
+                "Bypassing Anti-Cheat Heuristics...",
+                "<span class='log-ok'>[SUCCESS]</span> Injection Complete.",
+                "Launching Menu GUI..."
             ];
 
             let i = 0;
+            termLog.innerHTML = ''; // clear previous
+
             const interval = setInterval(() => {
-                const line = document.createElement('div');
-                line.className = 'log-line';
-                line.innerHTML = `> ${logs[i]}`;
-                terminal.appendChild(line);
-                terminal.scrollTop = terminal.scrollHeight;
-                i++;
-
-                if (i >= logs.length) {
+                if (i < logs.length) {
+                    const line = document.createElement('div');
+                    line.style.marginBottom = '5px';
+                    line.innerHTML = `> ${logs[i]}`;
+                    termLog.appendChild(line);
+                    termLog.scrollTop = termLog.scrollHeight;
+                    i++;
+                } else {
                     clearInterval(interval);
-                    setTimeout(showInjector, 800);
+                    setTimeout(() => {
+                        termBox.style.display = 'none';
+                        btn.innerHTML = '<i class="fa-solid fa-check"></i> INJECTED';
+                        showMenu();
+                    }, 800);
                 }
-            }, 400);
+            }, 400); // Speed of text
         }
 
-        function showInjector() {
-            terminal.style.display = 'none';
-            injectorImg.style.display = 'block';
-            
-            // Show Injector for 2.5 seconds then load menu
+        function showMenu() {
+            const menu = document.getElementById('menu-window');
+            menu.style.display = 'flex';
+            // Slight delay to allow display:flex to apply before opacity transition
             setTimeout(() => {
-                injectorImg.style.display = 'none';
-                mainInterface.style.display = 'block';
-                setTimeout(() => { mainInterface.style.opacity = 1; }, 50);
-            }, 2500);
+                menu.style.opacity = '1';
+            }, 50);
         }
 
-        // --- MENU INTERACTION ---
+        // --- 2. MENU TABS ---
         const baseUrl = "https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Menu/";
         
-        function switchTab(name, btn) {
-            // Update Image
-            const img = document.getElementById('menu-display');
+        function switchTab(tabName, btnElement) {
+            // Highlight Button
+            document.querySelectorAll('.menu-tab').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            // Change Image
+            const img = document.getElementById('menu-img');
             img.style.opacity = 0;
             setTimeout(() => {
-                img.src = `${baseUrl}${name}.png`;
+                img.src = `${baseUrl}${tabName}.png`;
                 img.onload = () => { img.style.opacity = 1; };
-            }, 200);
-
-            // Update Buttons
-            document.querySelectorAll('.sidebar button').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            }, 150);
         }
 
-        // --- DRAG LOGIC ---
-        const dragItem = document.getElementById("dragWindow");
-        const dragHead = document.getElementById("dragHeader");
+        // --- 3. DRAGGABLE MENU ---
+        const dragItem = document.getElementById("menu-window");
+        const dragHandle = document.getElementById("drag-handle");
         let active = false;
         let currentX, currentY, initialX, initialY;
         let xOffset = 0, yOffset = 0;
 
-        dragHead.addEventListener("mousedown", dragStart);
+        dragHandle.addEventListener("mousedown", dragStart);
         document.addEventListener("mouseup", dragEnd);
         document.addEventListener("mousemove", drag);
 
         function dragStart(e) {
             initialX = e.clientX - xOffset;
             initialY = e.clientY - yOffset;
-            if (e.target === dragHead || dragHead.contains(e.target)) {
+            if (e.target === dragHandle || dragHandle.contains(e.target)) {
                 active = true;
             }
         }
