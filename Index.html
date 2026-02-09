@@ -1,1 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS RL SDK | Advanced Reinforcement Learning</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- VARIABLES & RESET --- */
+        :root {
+            --bg-color: #030303;
+            --surface-color: #0a0a0a;
+            --surface-light: #121212;
+            --accent-red: #d90429;
+            --accent-glow: #ff0f39;
+            --text-main: #e0e0e0;
+            --text-dim: #888;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-display: 'Space Grotesk', sans-serif;
+            --grid-line: rgba(255, 15, 57, 0.05);
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-display);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --- BACKGROUND EFFECTS --- */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.6;
+        }
+
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            perspective: 1000px;
+        }
+
+        /* --- UTILITY & TYPOGRAPHY --- */
+        h1, h2, h3 { font-weight: 700; text-transform: uppercase; letter-spacing: -1px; }
+        .mono { font-family: var(--font-mono); }
+        .text-red { color: var(--accent-glow); }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 0;
+            border-bottom: 1px solid rgba(255, 15, 57, 0.2);
+        }
+
+        .logo {
+            font-family: var(--font-mono);
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+        }
+        
+        .logo span { text-shadow: 0 0 10px var(--accent-red); }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            margin-left: 2rem;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-glow);
+            text-shadow: 0 0 8px var(--accent-red);
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 5rem;
+            line-height: 0.9;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-tagline {
+            font-family: var(--font-mono);
+            font-size: 1.2rem;
+            color: var(--accent-glow);
+            margin-bottom: 3rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.2rem;
+            background-color: var(--accent-glow);
+            animation: blink 1s infinite;
+            margin-left: 5px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 1rem 3rem;
+            background: transparent;
+            border: 1px solid var(--accent-red);
+            color: var(--accent-glow);
+            font-family: var(--font-mono);
+            font-weight: bold;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            width: fit-content;
+        }
+
+        .cta-btn:hover {
+            background: var(--accent-red);
+            color: #000;
+            box-shadow: 0 0 30px var(--accent-red);
+        }
+
+        /* --- MEDIA PLACEHOLDERS --- */
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+
+        .placeholder-frame {
+            border: 1px solid #333;
+            background: var(--surface-color);
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+
+        .placeholder-frame:hover {
+            border-color: var(--accent-red);
+            box-shadow: 0 0 20px rgba(217, 4, 41, 0.1);
+        }
+
+        .placeholder-frame::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* The actual placeholder visual */
+        .placeholder-content {
+            height: 100%;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-image: 
+                repeating-linear-gradient(45deg, #0d0d0d 25%, transparent 25%, transparent 75%, #0d0d0d 75%, #0d0d0d),
+                repeating-linear-gradient(45deg, #0d0d0d 25%, #111 25%, #111 75%, #0d0d0d 75%, #0d0d0d);
+            background-position: 0 0, 10px 10px;
+            background-size: 20px 20px;
+            opacity: 0.5;
+        }
+
+        .icon-overlay {
+            width: 60px;
+            height: 60px;
+            border: 2px solid var(--text-dim);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dim);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .label {
+            font-family: var(--font-mono);
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+        }
+
+        /* Terminal Style Code Block */
+        .terminal-window {
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+        }
+
+        .terminal-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .red { background: #ff5f56; }
+        .yellow { background: #ffbd2e; }
+        .green { background: #27c93f; }
+
+        code { color: #a9b7c6; display: block; }
+        .kwd { color: #cc7832; } /* keyword */
+        .str { color: #6a8759; } /* string */
+        .fn { color: #ffc66d; } /* function */
+        .var { color: var(--accent-glow); } /* variable */
+
+        /* --- STATS BAR --- */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-top: 1px solid #222;
+            border-bottom: 1px solid #222;
+            margin: 4rem 0;
+            padding: 2rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            border-right: 1px solid #222;
+        }
+        .stat-item:last-child { border: none; }
+        
+        .stat-num {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .stat-label {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--accent-red);
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            margin-top: 5rem;
+            padding: 3rem 0;
+            text-align: center;
+            border-top: 1px solid #222;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: #555;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="scanlines"></div>
+    <div class="bg-grid"></div>
+
+    <div class="container">
+        <nav>
+            <div class="logo">
+                <span class="text-red">NEXUS</span>_SDK
+            </div>
+            <div class="nav-links">
+                <a href="#">DOCUMENTATION</a>
+                <a href="#">MODELS</a>
+                <a href="#">BENCHMARKS</a>
+                <a href="#">GITHUB</a>
+            </div>
+        </nav>
+
+        <header class="hero">
+            <h4 class="mono text-red">> SYSTEM_READY</h4>
+            <h1>Train Agents<br>Without Limits.</h1>
+            <div class="hero-tagline">
+                <span id="typing-text"></span><span class="cursor"></span>
+            </div>
+            <a href="#" class="cta-btn">Initialize SDK</a>
+        </header>
+
+        <section>
+            <div class="showcase-grid">
+                
+                <div class="placeholder-frame">
+                    <div class="placeholder-content">
+                        <div class="icon-overlay">▶</div>
+                        <span class="label">Training_Env_Demo.mp4</span>
+                        <br>
+                        <span class="label mono" style="font-size: 0.7rem; color: #444;">1920x1080 // 60FPS</span>
+                    </div>
+                </div>
+
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <code>
+                        <span class="kwd">import</span> nexus <span class="kwd">as</span> rl<br><br>
+                        <span class="text-dim"># Initialize Environment</span><br>
+                        env = rl.<span class="fn">make</span>(<span class="str">"Cyber-V1"</span>)<br><br>
+                        <span class="text-dim"># Configure Agent</span><br>
+                        agent = rl.<span class="fn">PPO</span>(<br>
+                        &nbsp;&nbsp;env, <br>
+                        &nbsp;&nbsp;learning_rate=<span class="var">3e-4</span>,<br>
+                        &nbsp;&nbsp;device=<span class="str">"cuda"</span><br>
+                        )<br><br>
+                        <span class="text-dim"># Start Training</span><br>
+                        agent.<span class="fn">train</span>(steps=<span class="var">1_000_000</span>)
+                    </code>
+                </div>
+            </div>
+
+            <h3 class="mono text-red" style="margin-top: 4rem;">> VISUALIZATION_MODULES</h3>
+            <div class="showcase-grid" style="grid-template-columns: 1fr 1fr 1fr; margin-top: 1rem;">
+                
+                <div class="placeholder-frame" style="height: 250px;">
+                    <div class="placeholder-content">
+                        <div class="icon-overlay">IMG</div>
+                        <span class="label">Reward_Graph.png</span>
+                    </div>
+                </div>
+
+                <div class="placeholder-frame" style="height: 250px;">
+                    <div class="placeholder-content">
+                        <div class="icon-overlay">IMG</div>
+                        <span class="label">Agent_View.jpg</span>
+                    </div>
+                </div>
+
+                <div class="placeholder-frame" style="height: 250px;">
+                    <div class="placeholder-content">
+                        <div class="icon-overlay">IMG</div>
+                        <span class="label">Neural_Map.svg</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-num">20x</span>
+                <span class="stat-label">FASTER_TRAINING</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num">99.9%</span>
+                <span class="stat-label">UPTIME_SLA</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num">0ms</span>
+                <span class="stat-label">LATENCY_OVERHEAD</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num">v3.0</span>
+                <span class="stat-label">CURRENT_BUILD</span>
+            </div>
+        </section>
+
+        <footer>
+            <p>SIMGA RL SDK © 2026 // ALL SYSTEMS OPERATIONAL</p>
+            <p class="text-red" style="margin-top: 10px;">DESIGNED FOR HIGH-PERFORMANCE COMPUTING</p>
+        </footer>
+    </div>
+
+    <script>
+        // Simple Typing Effect
+        const text = "Accelerate reinforcement learning with next-gen heuristics.";
+        const typingElement = document.getElementById("typing-text");
+        let index = 0;
+
+        function type() {
+            if (index < text.length) {
+                typingElement.innerHTML += text.charAt(index);
+                index++;
+                setTimeout(type, 50); // Speed of typing
+            }
+        }
+        
+        // Start typing after a short delay
+        window.onload = () => {
+            setTimeout(type, 500);
+        };
+    </script>
+</body>
+</html>
