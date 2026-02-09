@@ -3,440 +3,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS RL SDK | Advanced Reinforcement Learning</title>
+    <title>SIGMA SDK | Premium RL Framework</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- VARIABLES & RESET --- */
+        /* --- CORE VARIABLES --- */
         :root {
-            --bg-color: #030303;
-            --surface-color: #0a0a0a;
-            --surface-light: #121212;
-            --accent-red: #d90429;
-            --accent-glow: #ff0f39;
-            --text-main: #e0e0e0;
-            --text-dim: #888;
+            --bg-color: #050505;
+            --surface-color: #0f0f0f;
+            --accent-red: #cc0000;
+            --accent-glow: #ff1a1a;
+            --text-main: #f0f0f0;
+            --text-dim: #666;
+            --menu-bg: #1a1a1a;
             --font-mono: 'JetBrains Mono', monospace;
             --font-display: 'Space Grotesk', sans-serif;
-            --grid-line: rgba(255, 15, 57, 0.05);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
             font-family: var(--font-display);
             overflow-x: hidden;
-            line-height: 1.6;
         }
 
-        /* --- BACKGROUND EFFECTS --- */
+        /* --- BACKGROUND FX --- */
         .scanlines {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
-            background-size: 100% 4px;
-            pointer-events: none;
-            z-index: 1000;
-            opacity: 0.6;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px; pointer-events: none; z-index: 999; opacity: 0.3;
+        }
+        
+        .vignette {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 50%, #000 120%);
+            pointer-events: none; z-index: 998;
         }
 
-        .bg-grid {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(var(--grid-line) 1px, transparent 1px),
-                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-            background-size: 40px 40px;
-            z-index: -1;
-            perspective: 1000px;
-        }
-
-        /* --- UTILITY & TYPOGRAPHY --- */
-        h1, h2, h3 { font-weight: 700; text-transform: uppercase; letter-spacing: -1px; }
+        /* --- TYPOGRAPHY --- */
+        h1, h2 { text-transform: uppercase; letter-spacing: -2px; }
         .mono { font-family: var(--font-mono); }
-        .text-red { color: var(--accent-glow); }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
+        .text-red { color: var(--accent-glow); text-shadow: 0 0 15px rgba(255, 26, 26, 0.4); }
 
-        /* --- NAVIGATION --- */
+        /* --- NAV --- */
         nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 2rem 0;
-            border-bottom: 1px solid rgba(255, 15, 57, 0.2);
+            display: flex; justify-content: space-between; padding: 2rem 4rem;
+            border-bottom: 1px solid rgba(255, 26, 26, 0.1);
+            backdrop-filter: blur(5px); position: relative; z-index: 100;
         }
-
-        .logo {
-            font-family: var(--font-mono);
-            font-weight: 800;
-            font-size: 1.5rem;
-            letter-spacing: -1px;
-        }
-        
-        .logo span { text-shadow: 0 0 10px var(--accent-red); }
-
-        .nav-links a {
-            color: var(--text-dim);
-            text-decoration: none;
-            margin-left: 2rem;
-            font-family: var(--font-mono);
-            font-size: 0.9rem;
-            transition: 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--accent-glow);
-            text-shadow: 0 0 8px var(--accent-red);
-        }
+        .logo { font-size: 1.5rem; font-weight: 800; font-family: var(--font-mono); }
 
         /* --- HERO SECTION --- */
         .hero {
-            height: 90vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            position: relative;
+            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            padding-top: 8rem; text-align: center; position: relative;
         }
 
         .hero h1 {
-            font-size: 5rem;
-            line-height: 0.9;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(to right, #fff, #888);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 5rem; line-height: 1; margin-bottom: 1rem;
+            background: linear-gradient(to bottom, #fff, #444);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        .hero-tagline {
-            font-family: var(--font-mono);
-            font-size: 1.2rem;
-            color: var(--accent-glow);
-            margin-bottom: 3rem;
-            display: flex;
-            align-items: center;
+        .hero p { font-family: var(--font-mono); color: var(--accent-glow); margin-bottom: 4rem; }
+
+        /* --- DRAGGABLE INTERACTIVE MENU --- */
+        .menu-container {
+            width: 800px; height: 500px;
+            perspective: 1000px;
+            position: relative; margin-bottom: 5rem;
         }
 
-        .cursor {
-            display: inline-block;
-            width: 10px;
-            height: 1.2rem;
-            background-color: var(--accent-glow);
-            animation: blink 1s infinite;
-            margin-left: 5px;
-        }
-
-        .cta-btn {
-            display: inline-block;
-            padding: 1rem 3rem;
-            background: transparent;
-            border: 1px solid var(--accent-red);
-            color: var(--accent-glow);
-            font-family: var(--font-mono);
-            font-weight: bold;
-            text-transform: uppercase;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            width: fit-content;
-        }
-
-        .cta-btn:hover {
-            background: var(--accent-red);
-            color: #000;
-            box-shadow: 0 0 30px var(--accent-red);
-        }
-
-        /* --- MEDIA PLACEHOLDERS --- */
-        .showcase-grid {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr;
-            gap: 2rem;
-            margin: 4rem 0;
-        }
-
-        .placeholder-frame {
+        .sigma-menu {
+            position: absolute;
+            width: 100%; height: 100%;
+            background: #111;
             border: 1px solid #333;
-            background: var(--surface-color);
-            position: relative;
-            overflow: hidden;
+            border-top: 2px solid var(--accent-red);
+            box-shadow: 0 0 50px rgba(0,0,0,0.8), 0 0 20px rgba(204, 0, 0, 0.1);
+            display: flex; flex-direction: column;
+            border-radius: 4px; overflow: hidden;
+            /* Draggable positioning */
+            left: 0; top: 0;
+            transform-style: preserve-3d;
+            transition: transform 0.1s;
+        }
+
+        /* Header / Drag Handle */
+        .menu-header {
+            background: #181818; padding: 10px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #222;
+            cursor: grab; user-select: none;
+        }
+        .menu-header:active { cursor: grabbing; }
+        .menu-title { font-family: var(--font-mono); font-size: 0.8rem; color: #fff; font-weight: bold; }
+
+        /* Menu Body */
+        .menu-body {
+            display: flex; height: 100%;
+        }
+
+        /* Sidebar Tabs */
+        .sidebar {
+            width: 200px; background: #141414;
+            border-right: 1px solid #222;
+            padding: 1rem 0; display: flex; flex-direction: column; gap: 5px;
+        }
+
+        .tab-btn {
+            background: transparent; border: none;
+            color: #666; font-family: var(--font-mono);
+            font-size: 0.9rem; text-align: left;
+            padding: 12px 20px; cursor: pointer;
+            transition: 0.2s; position: relative;
+        }
+
+        .tab-btn:hover { color: #fff; background: #1a1a1a; }
+        .tab-btn.active { color: var(--accent-glow); background: rgba(255, 26, 26, 0.05); border-left: 2px solid var(--accent-red); }
+
+        /* Preview Area */
+        .preview-area {
+            flex-grow: 1; background: #000;
+            position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .menu-screenshot {
+            max-width: 100%; max-height: 100%;
+            object-fit: contain;
+            transition: opacity 0.3s ease;
+        }
+
+        .drag-hint {
+            position: absolute; bottom: -30px; width: 100%; text-align: center;
+            font-family: var(--font-mono); font-size: 0.7rem; color: #444;
+        }
+
+        /* --- INGAME SHOWCASE --- */
+        .ingame-section {
+            width: 100%; max-width: 1200px; margin: 0 auto 5rem;
+            padding: 2rem;
+        }
+        .section-header { margin-bottom: 2rem; border-left: 3px solid var(--accent-red); padding-left: 1rem; }
+        
+        .ingame-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+        }
+        
+        .ingame-card {
+            border: 1px solid #222; position: relative;
+            height: 300px; overflow: hidden;
             transition: 0.3s;
         }
-
-        .placeholder-frame:hover {
-            border-color: var(--accent-red);
-            box-shadow: 0 0 20px rgba(217, 4, 41, 0.1);
-        }
-
-        .placeholder-frame::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
-            pointer-events: none;
-            z-index: 2;
-        }
-
-        /* The actual placeholder visual */
-        .placeholder-content {
-            height: 100%;
-            min-height: 400px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background-image: 
-                repeating-linear-gradient(45deg, #0d0d0d 25%, transparent 25%, transparent 75%, #0d0d0d 75%, #0d0d0d),
-                repeating-linear-gradient(45deg, #0d0d0d 25%, #111 25%, #111 75%, #0d0d0d 75%, #0d0d0d);
-            background-position: 0 0, 10px 10px;
-            background-size: 20px 20px;
-            opacity: 0.5;
-        }
-
-        .icon-overlay {
-            width: 60px;
-            height: 60px;
-            border: 2px solid var(--text-dim);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-dim);
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .label {
-            font-family: var(--font-mono);
-            color: var(--text-dim);
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-        }
-
-        /* Terminal Style Code Block */
-        .terminal-window {
-            background: #000;
-            border: 1px solid #333;
-            border-radius: 4px;
-            padding: 1.5rem;
-            font-family: var(--font-mono);
-            font-size: 0.9rem;
-        }
-
-        .terminal-header {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 1rem;
-        }
-        .dot { width: 10px; height: 10px; border-radius: 50%; }
-        .red { background: #ff5f56; }
-        .yellow { background: #ffbd2e; }
-        .green { background: #27c93f; }
-
-        code { color: #a9b7c6; display: block; }
-        .kwd { color: #cc7832; } /* keyword */
-        .str { color: #6a8759; } /* string */
-        .fn { color: #ffc66d; } /* function */
-        .var { color: var(--accent-glow); } /* variable */
-
-        /* --- STATS BAR --- */
-        .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            border-top: 1px solid #222;
-            border-bottom: 1px solid #222;
-            margin: 4rem 0;
-            padding: 2rem 0;
-        }
-
-        .stat-item {
-            text-align: center;
-            border-right: 1px solid #222;
-        }
-        .stat-item:last-child { border: none; }
+        .ingame-card:hover { border-color: var(--accent-red); }
         
-        .stat-num {
-            display: block;
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #fff;
+        .ingame-card img {
+            width: 100%; height: 100%; object-fit: cover; opacity: 0.7;
+            transition: 0.5s;
         }
-        .stat-label {
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            color: var(--accent-red);
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
+        .ingame-card:hover img { opacity: 1; transform: scale(1.05); }
 
         /* --- FOOTER --- */
         footer {
-            margin-top: 5rem;
-            padding: 3rem 0;
-            text-align: center;
-            border-top: 1px solid #222;
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            color: #555;
+            border-top: 1px solid #222; padding: 2rem; text-align: center;
+            font-family: var(--font-mono); font-size: 0.8rem; color: #444;
         }
-
     </style>
 </head>
 <body>
 
     <div class="scanlines"></div>
-    <div class="bg-grid"></div>
+    <div class="vignette"></div>
 
-    <div class="container">
-        <nav>
-            <div class="logo">
-                <span class="text-red">NEXUS</span>_SDK
-            </div>
-            <div class="nav-links">
-                <a href="#">DOCUMENTATION</a>
-                <a href="#">MODELS</a>
-                <a href="#">BENCHMARKS</a>
-                <a href="#">GITHUB</a>
-            </div>
-        </nav>
+    <nav>
+        <div class="logo">SIGMA<span class="text-red">SDK</span></div>
+        <div class="mono" style="font-size: 0.8rem; color: #666;">BUILD_V4.02</div>
+    </nav>
 
-        <header class="hero">
-            <h4 class="mono text-red">> SYSTEM_READY</h4>
-            <h1>Train Agents<br>Without Limits.</h1>
-            <div class="hero-tagline">
-                <span id="typing-text"></span><span class="cursor"></span>
-            </div>
-            <a href="#" class="cta-btn">Initialize SDK</a>
-        </header>
+    <div class="hero">
+        <h2 class="mono text-red" style="font-size: 1rem; margin-bottom: 1rem;">> INITIALIZING_INTERFACE...</h2>
+        <h1>DOMINATE<br>THE LOBBY</h1>
+        <p>[ INTERACTIVE PREVIEW :: DRAG MENU TO INSPECT ]</p>
 
-        <section>
-            <div class="showcase-grid">
-                
-                <div class="placeholder-frame">
-                    <div class="placeholder-content">
-                        <div class="icon-overlay">▶</div>
-                        <span class="label">Training_Env_Demo.mp4</span>
-                        <br>
-                        <span class="label mono" style="font-size: 0.7rem; color: #444;">1920x1080 // 60FPS</span>
+        <div class="menu-container">
+            <div class="sigma-menu" id="draggableMenu">
+                <div class="menu-header" id="dragHeader">
+                    <span class="menu-title">⚡ SIGMA SDK // MAIN</span>
+                    <div style="display:flex; gap:5px;">
+                        <div style="width:10px; height:10px; background:#444; border-radius:50%;"></div>
+                        <div style="width:10px; height:10px; background:#cc0000; border-radius:50%;"></div>
                     </div>
                 </div>
 
-                <div class="terminal-window">
-                    <div class="terminal-header">
-                        <div class="dot red"></div>
-                        <div class="dot yellow"></div>
-                        <div class="dot green"></div>
+                <div class="menu-body">
+                    <div class="sidebar">
+                        <button class="tab-btn active" onclick="changeTab('Home')">Home</button>
+                        <button class="tab-btn" onclick="changeTab('Visuals')">Visuals</button>
+                        <button class="tab-btn" onclick="changeTab('Injector')">Injector</button>
+                        <button class="tab-btn" onclick="changeTab('Matchmaking')">Matchmaking</button>
+                        <button class="tab-btn" onclick="changeTab('Humanizer')">Humanizer</button>
                     </div>
-                    <code>
-                        <span class="kwd">import</span> nexus <span class="kwd">as</span> rl<br><br>
-                        <span class="text-dim"># Initialize Environment</span><br>
-                        env = rl.<span class="fn">make</span>(<span class="str">"Cyber-V1"</span>)<br><br>
-                        <span class="text-dim"># Configure Agent</span><br>
-                        agent = rl.<span class="fn">PPO</span>(<br>
-                        &nbsp;&nbsp;env, <br>
-                        &nbsp;&nbsp;learning_rate=<span class="var">3e-4</span>,<br>
-                        &nbsp;&nbsp;device=<span class="str">"cuda"</span><br>
-                        )<br><br>
-                        <span class="text-dim"># Start Training</span><br>
-                        agent.<span class="fn">train</span>(steps=<span class="var">1_000_000</span>)
-                    </code>
-                </div>
-            </div>
-
-            <h3 class="mono text-red" style="margin-top: 4rem;">> VISUALIZATION_MODULES</h3>
-            <div class="showcase-grid" style="grid-template-columns: 1fr 1fr 1fr; margin-top: 1rem;">
-                
-                <div class="placeholder-frame" style="height: 250px;">
-                    <div class="placeholder-content">
-                        <div class="icon-overlay">IMG</div>
-                        <span class="label">Reward_Graph.png</span>
+                    
+                    <div class="preview-area">
+                        <img id="menuImage" src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Menu/Home.png" class="menu-screenshot" alt="Menu Preview">
                     </div>
                 </div>
+            </div>
+            <p class="drag-hint">// CLICK & DRAG HEADER TO MOVE WINDOW //</p>
+        </div>
 
-                <div class="placeholder-frame" style="height: 250px;">
-                    <div class="placeholder-content">
-                        <div class="icon-overlay">IMG</div>
-                        <span class="label">Agent_View.jpg</span>
-                    </div>
+        <div class="ingame-section">
+            <div class="section-header">
+                <h3 class="text-red mono">>> INGAME_VISUALIZATION</h3>
+            </div>
+            <div class="ingame-grid">
+                <div class="ingame-card">
+                    <img src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Ingame/Image1.png" alt="Ingame 1">
+                    <div style="position: absolute; bottom: 10px; left: 10px; background: #000; padding: 2px 5px; font-size: 0.7rem;" class="mono">ESP_MODULE_ACTIVE</div>
                 </div>
-
-                <div class="placeholder-frame" style="height: 250px;">
-                    <div class="placeholder-content">
-                        <div class="icon-overlay">IMG</div>
-                        <span class="label">Neural_Map.svg</span>
-                    </div>
+                <div class="ingame-card">
+                    <img src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Ingame/Image2.png" alt="Ingame 2">
+                    <div style="position: absolute; bottom: 10px; left: 10px; background: #000; padding: 2px 5px; font-size: 0.7rem;" class="mono">FOV_DEBUG_LAYER</div>
                 </div>
+            </div>
+        </div>
 
-            </div>
-        </section>
-
-        <section class="stats-bar">
-            <div class="stat-item">
-                <span class="stat-num">20x</span>
-                <span class="stat-label">FASTER_TRAINING</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-num">99.9%</span>
-                <span class="stat-label">UPTIME_SLA</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-num">0ms</span>
-                <span class="stat-label">LATENCY_OVERHEAD</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-num">v3.0</span>
-                <span class="stat-label">CURRENT_BUILD</span>
-            </div>
-        </section>
-
-        <footer>
-            <p>SIMGA RL SDK © 2026 // ALL SYSTEMS OPERATIONAL</p>
-            <p class="text-red" style="margin-top: 10px;">DESIGNED FOR HIGH-PERFORMANCE COMPUTING</p>
-        </footer>
     </div>
 
-    <script>
-        // Simple Typing Effect
-        const text = "Accelerate reinforcement learning with next-gen heuristics.";
-        const typingElement = document.getElementById("typing-text");
-        let index = 0;
+    <footer>
+        SIGMA SDK © 2024 // ALL RIGHTS RESERVED<br>
+        <span style="color: #333">UNDETECTED SINCE RELEASE</span>
+    </footer>
 
-        function type() {
-            if (index < text.length) {
-                typingElement.innerHTML += text.charAt(index);
-                index++;
-                setTimeout(type, 50); // Speed of typing
+    <script>
+        // --- 1. TAB SWITCHING LOGIC ---
+        // Base URL for your raw github images
+        const baseURL = "https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Menu/";
+
+        function changeTab(tabName) {
+            // Update the Image
+            const img = document.getElementById('menuImage');
+            img.style.opacity = 0; // fade out effect
+            
+            setTimeout(() => {
+                img.src = `${baseURL}${tabName}.png`;
+                img.onload = () => { img.style.opacity = 1; } // fade in on load
+            }, 100);
+
+            // Update Active Button State
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText.includes(tabName)) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // --- 2. DRAGGABLE MENU LOGIC ---
+        const menu = document.getElementById("draggableMenu");
+        const header = document.getElementById("dragHeader");
+
+        let isDragging = false;
+        let currentX;
+        let currentY;
+        let initialX;
+        let initialY;
+        let xOffset = 0;
+        let yOffset = 0;
+
+        header.addEventListener("mousedown", dragStart);
+        document.addEventListener("mouseup", dragEnd);
+        document.addEventListener("mousemove", drag);
+
+        function dragStart(e) {
+            initialX = e.clientX - xOffset;
+            initialY = e.clientY - yOffset;
+
+            if (e.target === header || header.contains(e.target)) {
+                isDragging = true;
             }
         }
-        
-        // Start typing after a short delay
-        window.onload = () => {
-            setTimeout(type, 500);
-        };
+
+        function dragEnd(e) {
+            initialX = currentX;
+            initialY = currentY;
+            isDragging = false;
+        }
+
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+
+                xOffset = currentX;
+                yOffset = currentY;
+
+                setTranslate(currentX, currentY, menu);
+            }
+        }
+
+        function setTranslate(xPos, yPos, el) {
+            el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+        }
     </script>
 </body>
 </html>
