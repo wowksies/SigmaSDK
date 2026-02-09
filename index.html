@@ -16,6 +16,7 @@
             --surface: #0a0a0a;
             --accent-red: #d90429;
             --accent-glow: #ff0f39;
+            --accent-warn: #ffbd2e; /* Yellow for "Coming Soon" */
             --text-main: #ffffff;
             --text-dim: #888888;
             --font-mono: 'JetBrains Mono', monospace;
@@ -82,6 +83,34 @@
         }
         
         .hero p { font-size: 1rem; color: var(--text-dim); max-width: 600px; margin-bottom: 2rem; }
+
+        /* WARNING BOX */
+        .dev-notice {
+            border: 1px solid var(--accent-warn);
+            background: rgba(255, 189, 46, 0.05);
+            color: var(--accent-warn);
+            padding: 10px 20px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            margin-bottom: 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(255, 189, 46, 0.1);
+        }
+
+        .pulse-dot {
+            width: 8px; height: 8px; background: var(--accent-warn);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; box-shadow: 0 0 0 0 rgba(255, 189, 46, 0.4); }
+            70% { opacity: 1; box-shadow: 0 0 0 10px rgba(255, 189, 46, 0); }
+            100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255, 189, 46, 0); }
+        }
 
         .btn-primary {
             background: var(--accent-red); color: #fff; border: none;
@@ -239,7 +268,7 @@
         <nav>
             <div class="logo">
                 <i class="fa-solid fa-cube text-red"></i> SIGMA SDK
-                <span class="dev-tag">V4.2</span>
+                <span class="dev-tag">SHOWCASE</span>
             </div>
             <a href="https://discord.com/users/747411610389446747" target="_blank" class="discord-btn">
                 <i class="fa-brands fa-discord"></i> CONTACT / ADD BOT
@@ -247,12 +276,20 @@
         </nav>
 
         <header class="hero">
+            <div class="dev-notice">
+                <div class="pulse-dot"></div>
+                PREVIEW BUILD: SIGMA BOT INTEGRATION COMING SOON
+            </div>
+
             <h4 class="mono text-red" style="font-size: 0.8rem; margin-bottom: 0.5rem;">> SYSTEM_OVERRIDE_ACTIVE</h4>
             <h1>DOMINATE THE LOBBY.</h1>
-            <p>The most advanced, undetected automation framework on the market.</p>
+            <p>
+                This represents a visual showcase of the Sigma SDK. 
+                <br>The <strong>Sigma Bot</strong> automation features are currently in development.
+            </p>
             
             <button class="btn-primary" onclick="startInjection()">
-                <i class="fa-solid fa-terminal"></i> INJECT SDK
+                <i class="fa-solid fa-terminal"></i> INJECT PREVIEW
             </button>
         </header>
 
@@ -292,19 +329,19 @@
         <section class="features-section">
             <div class="features-grid">
                 <div class="feature-card">
+                    <i class="fa-solid fa-robot"></i>
+                    <h3>Sigma Bot (W.I.P)</h3>
+                    <p>The upcoming Sigma Bot module will revolutionize gameplay automation. Currently in advanced development stages.</p>
+                </div>
+                <div class="feature-card">
                     <i class="fa-solid fa-shield-virus"></i>
                     <h3>Anticheat Bypass & Kernel Injection</h3>
-                    <p>Utilizing next-gen kernel manipulation to bypass the future incoming anticheat, Easy-AntiCheat. Stay invisible with ring-0 permissions.</p>
+                    <p>Utilizing next-gen kernel manipulation to bypass upcoming Easy-AntiCheat. Stay invisible with ring-0 permissions.</p>
                 </div>
                 <div class="feature-card">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                     <h3>Advanced Visuals</h3>
-                    <p>Experience high-fidelity ESP, Skeleton Chams, and Loot Glow. Fully customizable colors and render distance for competitive play.</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fa-solid fa-bolt"></i>
-                    <h3>0ms Latency</h3>
-                    <p>Optimized C++ architecture ensures no FPS drops. The SDK runs on a separate thread, keeping your game buttery smooth.</p>
+                    <p>Experience high-fidelity ESP, Skeleton Chams, and Loot Glow. Fully customizable colors and render distance.</p>
                 </div>
             </div>
         </section>
