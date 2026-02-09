@@ -69,9 +69,9 @@
         }
         .discord-btn:hover { background: #4752c4; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(88, 101, 242, 0.4); }
 
-        /* --- COMPACT HERO --- */
+        /* --- HERO --- */
         .hero {
-            padding: 4rem 0 3rem; /* Reduced padding */
+            padding: 4rem 0 3rem;
             display: flex; flex-direction: column; align-items: center; text-align: center;
         }
 
@@ -92,7 +92,7 @@
         }
         .btn-primary:hover { background: var(--accent-glow); box-shadow: 0 0 25px rgba(217, 4, 41, 0.5); }
 
-        /* --- INTERACTIVE MENU (Compact & Clear) --- */
+        /* --- INTERACTIVE MENU --- */
         .demo-wrapper {
             width: 100%; margin: 0 auto 4rem;
             perspective: 1200px; min-height: 520px; 
@@ -112,7 +112,7 @@
 
         /* Menu Window */
         .menu-window {
-            width: 850px; height: 500px; /* Slightly more compact */
+            width: 850px; height: 500px;
             background: #0f0f0f;
             border: 1px solid #222; border-top: 3px solid var(--accent-red);
             position: absolute; display: none; opacity: 0;
@@ -144,16 +144,15 @@
             overflow: hidden; padding: 0;
         }
         
-        /* High Clarity Image Settings */
         .menu-viewport img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: contain; /* Ensures the whole image is seen */
-            image-rendering: -webkit-optimize-contrast; /* Sharpening */
+            width: 100%; height: 100%; object-fit: contain;
+            image-rendering: -webkit-optimize-contrast;
+            cursor: zoom-in; /* Change cursor to indicate clickability */
+            transition: transform 0.2s;
         }
-
+        
         /* --- FEATURES GRID --- */
-        .features-section { margin-bottom: 4rem; } /* Reduced Margin */
+        .features-section { margin-bottom: 4rem; }
         
         .features-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;
@@ -174,13 +173,42 @@
         
         .media-item { border: 1px solid #222; position: relative; height: 300px; overflow: hidden; background: #000; }
         .media-item iframe { width: 100%; height: 100%; border: none; }
-        .media-item img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: 0.5s; }
+        
+        .media-item img { 
+            width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: 0.5s; 
+            cursor: zoom-in; /* Change cursor here too */
+        }
         .media-item:hover img { opacity: 1; transform: scale(1.02); }
+        
         .media-label {
             position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.9);
             padding: 4px 8px; font-family: var(--font-mono); font-size: 0.7rem; 
-            border-left: 2px solid var(--accent-red); color: #fff;
+            border-left: 2px solid var(--accent-red); color: #fff; pointer-events: none;
         }
+
+        /* --- LIGHTBOX (FULL SCREEN IMAGE) --- */
+        #lightbox {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 5000;
+            justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+
+        #lightbox.active { display: flex; opacity: 1; }
+
+        #lightbox img {
+            max-width: 90%; max-height: 90%;
+            border: 2px solid var(--accent-red);
+            box-shadow: 0 0 50px rgba(217, 4, 41, 0.2);
+            object-fit: contain;
+        }
+
+        #lightbox-close {
+            position: absolute; top: 30px; right: 40px;
+            color: #fff; font-size: 3rem; cursor: pointer;
+            transition: 0.3s;
+        }
+        #lightbox-close:hover { color: var(--accent-red); }
 
         /* --- FOOTER --- */
         footer {
@@ -188,7 +216,6 @@
             text-align: center; background: #020202; margin-top: auto;
         }
 
-        /* Mobile */
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.5rem; }
             .menu-window { width: 100%; height: 350px; }
@@ -202,6 +229,11 @@
 
     <div class="noise"></div>
     <div class="grid-bg"></div>
+
+    <div id="lightbox" onclick="closeLightbox()">
+        <span id="lightbox-close">&times;</span>
+        <img id="lightbox-img" src="" alt="Full Screen Preview">
+    </div>
 
     <div class="container">
         <nav>
@@ -250,7 +282,7 @@
                         <button class="menu-tab" onclick="switchTab('Humanizer', this)">Humanizer</button>
                     </div>
                     <div class="menu-viewport">
-                        <img id="menu-img" src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Menu/Home.png" alt="Menu Preview">
+                        <img id="menu-img" onclick="openLightbox(this.src)" src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Menu/Home.png" alt="Menu Preview" title="Click to Expand">
                     </div>
                 </div>
             </div>
@@ -259,25 +291,21 @@
 
         <section class="features-section">
             <div class="features-grid">
-                
                 <div class="feature-card">
                     <i class="fa-solid fa-shield-virus"></i>
                     <h3>Anticheat Bypass & Kernel Injection</h3>
-                    <p>Utilizing next-gen kernel manipulation to bypass Ricochet, Vanguard, and EAC. Stay invisible with ring-0 permissions.</p>
+                    <p>Utilizing next-gen kernel manipulation to bypass the future incoming anticheat, Easy-AntiCheat. Stay invisible with ring-0 permissions.</p>
                 </div>
-                
                 <div class="feature-card">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                     <h3>Advanced Visuals</h3>
                     <p>Experience high-fidelity ESP, Skeleton Chams, and Loot Glow. Fully customizable colors and render distance for competitive play.</p>
                 </div>
-                
                 <div class="feature-card">
                     <i class="fa-solid fa-bolt"></i>
                     <h3>0ms Latency</h3>
                     <p>Optimized C++ architecture ensures no FPS drops. The SDK runs on a separate thread, keeping your game buttery smooth.</p>
                 </div>
-
             </div>
         </section>
 
@@ -298,11 +326,11 @@
             <div class="media-grid">
                 <div class="media-item">
                     <div class="media-label">INGAME_VISUALS_V1</div>
-                    <img src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Ingame/Ingame1.png" alt="ESP Preview">
+                    <img onclick="openLightbox(this.src)" src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Ingame/Ingame1.png" alt="ESP Preview" title="Click to Expand">
                 </div>
                 <div class="media-item">
                     <div class="media-label">INGAME_DEBUG_LAYER</div>
-                    <img src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Ingame/Ingame2.png" alt="FOV Preview">
+                    <img onclick="openLightbox(this.src)" src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Ingame/Ingame2.png" alt="FOV Preview" title="Click to Expand">
                 </div>
             </div>
         </section>
@@ -322,7 +350,30 @@
     </div>
 
     <script>
-        // --- 1. TERMINAL & INJECTION ---
+        // --- LIGHTBOX LOGIC ---
+        function openLightbox(src) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            
+            lightboxImg.src = src;
+            lightbox.classList.add('active'); // Use CSS class for display flex
+            
+            // Animation handling
+            requestAnimationFrame(() => {
+                lightbox.style.opacity = '1';
+            });
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.style.opacity = '0';
+            
+            setTimeout(() => {
+                lightbox.classList.remove('active');
+            }, 300); // Wait for transition
+        }
+
+        // --- INJECTION SEQUENCE ---
         function startInjection() {
             const btn = document.querySelector('.btn-primary');
             const termBox = document.getElementById('terminal');
@@ -372,7 +423,7 @@
             setTimeout(() => { menu.style.opacity = '1'; }, 50);
         }
 
-        // --- 2. MENU TABS ---
+        // --- MENU TABS ---
         const baseUrl = "https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Menu/";
         
         function switchTab(tabName, btnElement) {
@@ -380,7 +431,6 @@
             btnElement.classList.add('active');
 
             const img = document.getElementById('menu-img');
-            // Quick fade for smoothness
             img.style.opacity = 0.5;
             setTimeout(() => {
                 img.src = `${baseUrl}${tabName}.png`;
@@ -388,7 +438,7 @@
             }, 100);
         }
 
-        // --- 3. DRAGGABLE LOGIC ---
+        // --- DRAGGABLE LOGIC ---
         const dragItem = document.getElementById("menu-window");
         const dragHandle = document.getElementById("drag-handle");
         let active = false;
