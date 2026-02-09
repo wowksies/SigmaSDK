@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGMA SDK | Premium RL Framework</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- CORE VARIABLES --- */
+        :root {
+            --bg-color: #050505;
+            --surface-color: #0f0f0f;
+            --accent-red: #d90429;
+            --accent-glow: #ff0f39;
+            --text-main: #f0f0f0;
+            --text-dim: #888;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-display: 'Space Grotesk', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-display);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* --- BACKGROUND FX --- */
+        .noise {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: 0.05; pointer-events: none; z-index: 900;
+        }
+
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px; pointer-events: none; z-index: 901;
+        }
+
+        .glow-spot {
+            position: fixed; top: -20%; left: 50%; transform: translateX(-50%);
+            width: 800px; height: 800px;
+            background: radial-gradient(circle, rgba(217, 4, 41, 0.15) 0%, transparent 70%);
+            pointer-events: none; z-index: 0;
+        }
+
+        /* --- UI COMPONENTS --- */
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 10; }
+        .mono { font-family: var(--font-mono); }
+        .text-red { color: var(--accent-glow); text-shadow: 0 0 15px rgba(255, 15, 57, 0.4); }
+        
+        .btn {
+            background: transparent; border: 1px solid var(--accent-red);
+            color: var(--accent-glow); padding: 1rem 3rem;
+            font-family: var(--font-mono); font-weight: bold; cursor: pointer;
+            transition: 0.3s; text-transform: uppercase; letter-spacing: 2px;
+            position: relative; overflow: hidden;
+        }
+        .btn:hover { background: var(--accent-red); color: #000; box-shadow: 0 0 30px var(--accent-red); }
+
+        /* --- HEADER --- */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 2rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; }
+
+        /* --- HERO & INJECTION SEQUENCE --- */
+        .hero {
+            min-height: 85vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+        }
+
+        .hero h1 { font-size: 5rem; line-height: 0.9; margin-bottom: 1.5rem; text-transform: uppercase; }
+        .hero p { font-family: var(--font-mono); color: var(--text-dim); max-width: 600px; margin-bottom: 3rem; }
+
+        /* TERMINAL LOADER */
+        #terminal {
+            display: none; width: 500px; background: #000; border: 1px solid #333;
+            padding: 1rem; font-family: var(--font-mono); font-size: 0.8rem;
+            text-align: left; height: 300px; overflow-y: auto;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+        }
+        .log-line { margin-bottom: 4px; display: block; }
+        .log-success { color: #0f0; }
+        .log-warn { color: #fc0; }
+
+        /* INJECTOR PREVIEW */
+        #injector-preview {
+            display: none; width: 400px;
+            box-shadow: 0 0 50px rgba(217, 4, 41, 0.3);
+            border: 1px solid var(--accent-red);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* ACTUAL MENU */
+        #main-interface {
+            display: none; opacity: 0;
+            width: 900px; height: 550px;
+            position: relative; margin: 0 auto;
+            perspective: 1000px;
+            transition: opacity 1s ease;
+        }
+
+        .draggable-window {
+            position: absolute; width: 100%; height: 100%;
+            background: #111; border: 1px solid #333;
+            display: flex; flex-direction: column;
+            box-shadow: 0 20px 80px rgba(0,0,0,0.9);
+            border-radius: 6px; overflow: hidden;
+            left: 0; top: 0;
+        }
+
+        .window-header {
+            background: #181818; padding: 10px 15px; border-bottom: 1px solid #252525;
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: grab;
+        }
+        .window-header:active { cursor: grabbing; }
+
+        .window-body { display: flex; height: 100%; }
+        
+        .sidebar {
+            width: 180px; background: #141414; border-right: 1px solid #252525;
+            padding: 1rem 0; display: flex; flex-direction: column;
+        }
+        
+        .sidebar button {
+            background: none; border: none; color: #666; padding: 12px 20px;
+            text-align: left; font-family: var(--font-mono); cursor: pointer;
+            transition: 0.2s; position: relative;
+        }
+        .sidebar button:hover { color: #fff; background: #1f1f1f; }
+        .sidebar button.active { color: var(--accent-glow); background: rgba(217, 4, 41, 0.05); border-left: 2px solid var(--accent-red); }
+
+        .content-area {
+            flex-grow: 1; background: #080808; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+
+        .menu-img {
+            max-width: 100%; max-height: 100%;
+            object-fit: contain; /* Ensures high quality scaling */
+            opacity: 0; transition: opacity 0.3s;
+        }
+        
+        /* --- MEDIA SECTION --- */
+        .media-section { margin-top: 8rem; padding-bottom: 4rem; }
+        .section-title { font-size: 2rem; margin-bottom: 2rem; border-left: 4px solid var(--accent-red); padding-left: 1rem; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+        
+        .video-container {
+            position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;
+            border: 1px solid #333; background: #000;
+            transition: 0.3s;
+        }
+        .video-container:hover { border-color: var(--accent-red); box-shadow: 0 0 30px rgba(217, 4, 41, 0.1); }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+
+        .img-card {
+            height: 300px; border: 1px solid #333; overflow: hidden; position: relative;
+        }
+        .img-card img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; opacity: 0.7; }
+        .img-card:hover img { transform: scale(1.05); opacity: 1; }
+
+        /* Animation Keyframes */
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="noise"></div>
+    <div class="scanlines"></div>
+    <div class="glow-spot"></div>
+
+    <div class="container">
+        <nav>
+            <div class="logo">SIGMA <span class="text-red">SDK</span></div>
+            <div class="mono text-dim" style="font-size: 0.8rem;">STATUS: <span style="color:#0f0">UNDETECTED</span></div>
+        </nav>
+
+        <div class="hero">
+            
+            <div id="start-screen">
+                <h2 class="mono text-red" style="margin-bottom:1rem;">> READY_TO_INJECT</h2>
+                <h1>NEXT GENERATION<br>AUTOMATION</h1>
+                <p>Advanced heuristics. Cloud-based configs. 0ms Input Lag.</p>
+                <button class="btn" onclick="startInjection()">INITIALIZE SDK</button>
+            </div>
+
+            <div id="terminal"></div>
+
+            <img id="injector-preview" src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Menu/Injector.png" alt="Injector">
+
+            <div id="main-interface">
+                <div class="draggable-window" id="dragWindow">
+                    <div class="window-header" id="dragHeader">
+                        <span class="mono" style="font-size: 0.8rem; font-weight: bold;">SIGMA_SDK // MAIN_THREAD</span>
+                        <div style="width:10px; height:10px; background:var(--accent-red); border-radius:50%; box-shadow: 0 0 5px var(--accent-red);"></div>
+                    </div>
+                    <div class="window-body">
+                        <div class="sidebar">
+                            <button class="active" onclick="switchTab('Home', this)">Home</button>
+                            <button onclick="switchTab('Visuals', this)">Visuals</button>
+                            <button onclick="switchTab('Injector', this)">Injector</button>
+                            <button onclick="switchTab('Matchmaking', this)">Matchmaking</button>
+                            <button onclick="switchTab('Humanizer', this)">Humanizer</button>
+                        </div>
+                        <div class="content-area">
+                            <img id="menu-display" class="menu-img" src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Menu/Home.png" alt="Menu Content" style="opacity: 1;">
+                        </div>
+                    </div>
+                </div>
+                <p class="mono text-dim" style="margin-top: 1rem; font-size: 0.8rem;">[ MOUSE_1 TO DRAG WINDOW ]</p>
+            </div>
+
+        </div>
+
+        <div class="media-section">
+            <h3 class="section-title mono">MEDIA_SHOWCASE</h3>
+            
+            <div class="grid-2">
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/W0mwIbr6kM0" title="Sigma Showcase 1" allowfullscreen></iframe>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/pSBrc2darcs" title="Sigma Showcase 2" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <h3 class="section-title mono" style="margin-top: 3rem;">INGAME_VISUALS</h3>
+            <div class="grid-2">
+                <div class="img-card">
+                    <img src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Ingame/Image1.png" alt="Ingame 1">
+                    <div style="position:absolute; bottom:15px; left:15px; background:black; padding:5px 10px; font-family:var(--font-mono); font-size:0.7rem;">VISUALS_ENABLED</div>
+                </div>
+                <div class="img-card">
+                    <img src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Ingame/Image2.png" alt="Ingame 2">
+                    <div style="position:absolute; bottom:15px; left:15px; background:black; padding:5px 10px; font-family:var(--font-mono); font-size:0.7rem;">DEBUG_VIEW</div>
+                </div>
+            </div>
+        </div>
+
+        <footer style="text-align: center; padding: 2rem; border-top: 1px solid #222; margin-top: 2rem;">
+            <p class="mono text-dim" style="font-size: 0.8rem;">SIGMA SDK © 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- INJECTION SEQUENCE LOGIC ---
+        const startScreen = document.getElementById('start-screen');
+        const terminal = document.getElementById('terminal');
+        const injectorImg = document.getElementById('injector-preview');
+        const mainInterface = document.getElementById('main-interface');
+
+        function startInjection() {
+            startScreen.style.display = 'none';
+            terminal.style.display = 'block';
+            
+            const logs = [
+                "Connecting to secure server...",
+                "Verifying HWID...",
+                "<span class='log-success'>[OK] HWID Verified</span>",
+                "Downloading cloud configs...",
+                "Mapping memory regions...",
+                "Bypassing integrity checks...",
+                "<span class='log-success'>[SUCCESS] Injected into process (ID: 4522)</span>"
+            ];
+
+            let i = 0;
+            const interval = setInterval(() => {
+                const line = document.createElement('div');
+                line.className = 'log-line';
+                line.innerHTML = `> ${logs[i]}`;
+                terminal.appendChild(line);
+                terminal.scrollTop = terminal.scrollHeight;
+                i++;
+
+                if (i >= logs.length) {
+                    clearInterval(interval);
+                    setTimeout(showInjector, 800);
+                }
+            }, 400);
+        }
+
+        function showInjector() {
+            terminal.style.display = 'none';
+            injectorImg.style.display = 'block';
+            
+            // Show Injector for 2.5 seconds then load menu
+            setTimeout(() => {
+                injectorImg.style.display = 'none';
+                mainInterface.style.display = 'block';
+                setTimeout(() => { mainInterface.style.opacity = 1; }, 50);
+            }, 2500);
+        }
+
+        // --- MENU INTERACTION ---
+        const baseUrl = "https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/Menu/";
+        
+        function switchTab(name, btn) {
+            // Update Image
+            const img = document.getElementById('menu-display');
+            img.style.opacity = 0;
+            setTimeout(() => {
+                img.src = `${baseUrl}${name}.png`;
+                img.onload = () => { img.style.opacity = 1; };
+            }, 200);
+
+            // Update Buttons
+            document.querySelectorAll('.sidebar button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // --- DRAG LOGIC ---
+        const dragItem = document.getElementById("dragWindow");
+        const dragHead = document.getElementById("dragHeader");
+        let active = false;
+        let currentX, currentY, initialX, initialY;
+        let xOffset = 0, yOffset = 0;
+
+        dragHead.addEventListener("mousedown", dragStart);
+        document.addEventListener("mouseup", dragEnd);
+        document.addEventListener("mousemove", drag);
+
+        function dragStart(e) {
+            initialX = e.clientX - xOffset;
+            initialY = e.clientY - yOffset;
+            if (e.target === dragHead || dragHead.contains(e.target)) {
+                active = true;
+            }
+        }
+
+        function dragEnd() {
+            initialX = currentX;
+            initialY = currentY;
+            active = false;
+        }
+
+        function drag(e) {
+            if (active) {
+                e.preventDefault();
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+                xOffset = currentX;
+                yOffset = currentY;
+                setTranslate(currentX, currentY, dragItem);
+            }
+        }
+
+        function setTranslate(xPos, yPos, el) {
+            el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+        }
+    </script>
+</body>
+</html>
