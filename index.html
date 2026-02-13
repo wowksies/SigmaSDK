@@ -196,6 +196,51 @@
         .feature-card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; font-weight: 700; color: #fff; }
         .feature-card p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; }
 
+        /* --- COMPARISON SLIDER --- */
+        .comparison-wrapper {
+            position: relative; width: 100%; max-width: 900px; margin: 0 auto 5rem;
+            border: 1px solid #333; border-radius: 4px; overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            aspect-ratio: 16/9; /* Enforces standard gaming aspect ratio */
+            user-select: none;
+        }
+
+        .comp-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; pointer-events: none;
+        }
+
+        /* The top image (Before) is clipped */
+        .img-before { z-index: 2; clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%); }
+        .img-after { z-index: 1; }
+
+        /* Labels */
+        .comp-label {
+            position: absolute; top: 20px; 
+            background: rgba(0,0,0,0.7); padding: 5px 10px;
+            font-family: var(--font-mono); font-size: 0.8rem; font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.2); pointer-events: none;
+            z-index: 10;
+        }
+        .label-before { left: 20px; color: #fff; }
+        .label-after { right: 20px; color: var(--accent-glow); border-color: var(--accent-red); }
+
+        /* Slider Handle */
+        .comp-slider {
+            position: absolute; top: 0; bottom: 0; left: 50%; width: 2px;
+            background: #fff; z-index: 20; cursor: ew-resize;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        
+        .slider-handle {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(0,0,0,0.5); border: 2px solid #fff;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 1rem; backdrop-filter: blur(5px);
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
+        }
+
         /* --- MEDIA --- */
         .media-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 4rem; }
         
@@ -349,6 +394,23 @@
         </section>
 
         <section class="features-section">
+            <h3 class="mono" style="margin-bottom: 2rem; text-align: center;">VISUAL ENHANCEMENT COMPARISON</h3>
+            
+            <div class="comparison-wrapper" id="comp-container">
+                <img src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/comparsion/after.png" class="comp-img img-after" alt="After">
+                
+                <img src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/comparsion/before.png" class="comp-img img-before" id="comp-overlay" alt="Before">
+                
+                <span class="comp-label label-before">VANILLA</span>
+                <span class="comp-label label-after">SIGMA</span>
+
+                <div class="comp-slider" id="comp-slider">
+                    <div class="slider-handle"><i class="fa-solid fa-arrows-left-right"></i></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
             <h3 class="mono" style="margin-bottom: 1rem; border-left: 3px solid var(--accent-red); padding-left: 10px;">MEDIA_SHOWCASE</h3>
             
             <div class="media-grid">
@@ -389,6 +451,38 @@
     </div>
 
     <script>
+        // --- COMPARISON SLIDER LOGIC ---
+        const container = document.getElementById('comp-container');
+        const slider = document.getElementById('comp-slider');
+        const overlay = document.getElementById('comp-overlay');
+
+        function moveSlider(e) {
+            // Get dimensional data
+            const rect = container.getBoundingClientRect();
+            // Calculate X position relative to container
+            let x = (e.clientX || e.touches[0].clientX) - rect.left;
+            
+            // Clamp values (prevent slider going outside)
+            if (x < 0) x = 0;
+            if (x > rect.width) x = rect.width;
+
+            // Calculate percentage
+            const percent = (x / rect.width) * 100;
+
+            // Apply styles
+            slider.style.left = percent + "%";
+            // Reveal the BEFORE image (Left Side) by clipping
+            // The BEFORE image is on top. If we want Left=Before, Right=After:
+            // We show 0 to X% of the Before Image.
+            overlay.style.clipPath = `polygon(0 0, ${percent}% 0, ${percent}% 100%, 0 100%)`;
+        }
+
+        // Event Listeners
+        container.addEventListener('mousemove', moveSlider);
+        container.addEventListener('touchmove', moveSlider);
+        // Initial Position
+        overlay.style.clipPath = `polygon(0 0, 50% 0, 50% 100%, 0 100%)`;
+
         // --- LIGHTBOX LOGIC ---
         function openLightbox(src) {
             const lightbox = document.getElementById('lightbox');
