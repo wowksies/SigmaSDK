@@ -83,7 +83,6 @@
         
         .hero p { font-size: 1rem; color: var(--text-dim); max-width: 650px; margin-bottom: 2rem; }
 
-        /* WARNING BOX */
         .dev-notice {
             border: 1px solid var(--accent-warn);
             background: rgba(255, 189, 46, 0.05);
@@ -104,56 +103,37 @@
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        @keyframes pulse {
-            0% { opacity: 1; box-shadow: 0 0 0 0 rgba(255, 189, 46, 0.4); }
-            70% { opacity: 1; box-shadow: 0 0 0 10px rgba(255, 189, 46, 0); }
-            100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255, 189, 46, 0); }
-        }
-
-        .btn-primary {
-            background: var(--accent-red); color: #fff; border: none;
-            padding: 0.8rem 2.5rem; font-family: var(--font-mono); font-weight: bold;
-            text-transform: uppercase; cursor: pointer; letter-spacing: 1px;
-            transition: 0.3s; position: relative; overflow: hidden;
-            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-        }
-        .btn-primary:hover { background: var(--accent-glow); box-shadow: 0 0 25px rgba(217, 4, 41, 0.5); }
-
-        /* --- INTERACTIVE MENU --- */
+        /* --- MENU WINDOW (VISIBLE DEFAULT) --- */
         .demo-wrapper {
-            width: 100%; margin: 0 auto 4rem;
-            perspective: 1200px; min-height: 520px; 
+            width: 100%; margin: 0 auto 6rem;
+            perspective: 1200px;
             display: flex; justify-content: center; align-items: center;
         }
 
-        /* Terminal */
-        .terminal-box {
-            width: 550px; background: #000; border: 1px solid #333;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.9); padding: 8px;
-            font-family: var(--font-mono); font-size: 0.8rem; display: none;
-        }
-        .term-header { background: #111; padding: 4px 8px; margin-bottom: 8px; display: flex; gap: 6px; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; }
-        .term-content { height: 250px; overflow-y: auto; color: #ccc; padding: 8px; }
-        .log-ok { color: #2ecc71; }
-
-        /* Menu Window */
         .menu-window {
             width: 850px; height: 500px;
             background: #0f0f0f;
             border: 1px solid #222; border-top: 3px solid var(--accent-red);
-            position: absolute; display: none; opacity: 0;
+            /* Changed from absolute to relative for better layout */
+            position: relative; 
+            display: flex; flex-direction: column;
             box-shadow: 0 40px 80px rgba(0,0,0,0.8);
             border-radius: 4px; overflow: hidden;
-            transition: opacity 0.5s ease;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
         }
         
         .menu-header {
-            background: #181818; padding: 8px 15px; cursor: grab;
+            background: #181818; padding: 8px 15px;
             display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222;
         }
-        .menu-header:active { cursor: grabbing; }
 
         .menu-body { display: flex; height: 100%; }
 
@@ -175,8 +155,7 @@
         .menu-viewport img { 
             width: 100%; height: 100%; object-fit: contain;
             image-rendering: -webkit-optimize-contrast;
-            cursor: zoom-in;
-            transition: transform 0.2s;
+            cursor: zoom-in; transition: transform 0.2s;
         }
         
         /* --- FEATURES GRID --- */
@@ -196,50 +175,88 @@
         .feature-card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; font-weight: 700; color: #fff; }
         .feature-card p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; }
 
-        /* --- COMPARISON SLIDER --- */
+        /* --- COMPARISON SLIDER (FIXED) --- */
+        .comparison-section {
+            margin-bottom: 6rem;
+            padding: 0 1rem;
+        }
+
         .comparison-wrapper {
-            position: relative; width: 100%; max-width: 900px; margin: 0 auto 5rem;
-            border: 1px solid #333; border-radius: 4px; overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            aspect-ratio: 16/9; /* Enforces standard gaming aspect ratio */
-            user-select: none;
+            position: relative; 
+            width: 100%; 
+            max-width: 900px; 
+            margin: 0 auto;
+            /* Aspect ratio matches 1920x1080 usually, adjust if needed */
+            aspect-ratio: 16/9; 
+            border: 2px solid #222; 
+            border-radius: 6px; 
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            background-color: #050505; /* Fallback color */
+            cursor: col-resize;
         }
 
         .comp-img {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover; pointer-events: none;
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            object-fit: cover; /* Ensures images fill box */
+            user-select: none;
+            pointer-events: none;
         }
 
-        /* The top image (Before) is clipped */
-        .img-before { z-index: 2; clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%); }
-        .img-after { z-index: 1; }
-
-        /* Labels */
-        .comp-label {
-            position: absolute; top: 20px; 
-            background: rgba(0,0,0,0.7); padding: 5px 10px;
-            font-family: var(--font-mono); font-size: 0.8rem; font-weight: bold;
-            border: 1px solid rgba(255,255,255,0.2); pointer-events: none;
-            z-index: 10;
-        }
-        .label-before { left: 20px; color: #fff; }
-        .label-after { right: 20px; color: var(--accent-glow); border-color: var(--accent-red); }
-
-        /* Slider Handle */
-        .comp-slider {
-            position: absolute; top: 0; bottom: 0; left: 50%; width: 2px;
-            background: #fff; z-index: 20; cursor: ew-resize;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        /* The BEFORE image is on top (z-index 2), we clip it to reveal AFTER (z-index 1) */
+        .img-before { 
+            z-index: 2; 
+            /* Start clipped at 50% */
+            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%); 
         }
         
-        .slider-handle {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 40px; height: 40px; border-radius: 50%;
-            background: rgba(0,0,0,0.5); border: 2px solid #fff;
-            display: flex; align-items: center; justify-content: center;
-            color: #fff; font-size: 1rem; backdrop-filter: blur(5px);
-            box-shadow: 0 0 15px rgba(0,0,0,0.8);
+        .img-after { 
+            z-index: 1; 
         }
+
+        .comp-slider-handle {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%; /* Start at 50% */
+            width: 2px;
+            background: var(--accent-red);
+            z-index: 10;
+            box-shadow: 0 0 10px var(--accent-glow);
+            pointer-events: none; /* Let clicks pass through to container */
+        }
+
+        .handle-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: var(--accent-red);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(255, 15, 57, 0.5);
+        }
+
+        .comp-label {
+            position: absolute; top: 20px; 
+            background: rgba(0,0,0,0.8); color: #fff;
+            padding: 5px 12px; border-radius: 4px;
+            font-family: var(--font-mono); font-size: 0.8rem; font-weight: bold;
+            z-index: 5; pointer-events: none;
+            border: 1px solid #333;
+        }
+        .label-left { left: 20px; }
+        .label-right { right: 20px; color: var(--accent-glow); border-color: var(--accent-red); }
+
 
         /* --- MEDIA --- */
         .media-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 4rem; }
@@ -332,28 +349,13 @@
                 The most advanced, highly protected <strong>Reinforcement Learning (RL) SDK</strong>.
                 <br>Fully obfuscated security. Sigma Bot automation coming soon.
             </p>
-            
-            <button class="btn-primary" onclick="startInjection()">
-                <i class="fa-solid fa-terminal"></i> INJECT PREVIEW
-            </button>
         </header>
 
         <div class="demo-wrapper">
-            
-            <div class="terminal-box" id="terminal">
-                <div class="term-header">
-                    <div class="dot" style="background:#ff5f56"></div>
-                    <div class="dot" style="background:#ffbd2e"></div>
-                    <div class="dot" style="background:#27c93f"></div>
-                    <span style="margin-left: 10px; color: #666;">kayaz@sigma-root:~</span>
-                </div>
-                <div class="term-content" id="term-log"></div>
-            </div>
-
             <div class="menu-window" id="menu-window">
-                <div class="menu-header" id="drag-handle">
+                <div class="menu-header">
                     <span class="mono" style="font-weight:bold; font-size: 0.8rem;">SIGMA_INTERNAL // GUI</span>
-                    <div class="mono" style="font-size: 0.7rem; color:#666;">[INS] TO CLOSE</div>
+                    <div class="mono" style="font-size: 0.7rem; color:#666;">STATUS: ACTIVE</div>
                 </div>
                 <div class="menu-body">
                     <div class="sidebar">
@@ -368,7 +370,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
         <section class="features-section">
@@ -393,21 +394,24 @@
             </div>
         </section>
 
-        <section class="features-section">
-            <h3 class="mono" style="margin-bottom: 2rem; text-align: center;">VISUAL ENHANCEMENT COMPARISON</h3>
+        <section class="comparison-section">
+            <h3 class="mono" style="text-align: center; margin-bottom: 2rem;">VISUAL ENHANCEMENT COMPARISON</h3>
             
-            <div class="comparison-wrapper" id="comp-container">
+            <div class="comparison-wrapper" id="compare-box" onmousemove="moveSlider(event)" ontouchmove="moveSlider(event)">
+                
+                <span class="comp-label label-left">VANILLA</span>
+                <span class="comp-label label-right">SIGMA</span>
+
                 <img src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/comparsion/after.png" class="comp-img img-after" alt="After">
                 
-                <img src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/comparsion/before.png" class="comp-img img-before" id="comp-overlay" alt="Before">
+                <img src="https://raw.githubusercontent.com/wowksies/SigmaSDK/main/Media/comparsion/before.png" class="comp-img img-before" id="before-img" alt="Before">
                 
-                <span class="comp-label label-before">VANILLA</span>
-                <span class="comp-label label-after">SIGMA</span>
-
-                <div class="comp-slider" id="comp-slider">
-                    <div class="slider-handle"><i class="fa-solid fa-arrows-left-right"></i></div>
+                <div class="comp-slider-handle" id="slider-handle">
+                    <div class="handle-icon"><i class="fa-solid fa-arrows-left-right"></i></div>
                 </div>
+
             </div>
+            <p class="mono" style="text-align: center; color: #555; font-size: 0.8rem; margin-top: 10px;">[ DRAG CURSOR TO COMPARE ]</p>
         </section>
 
         <section class="features-section">
@@ -452,100 +456,33 @@
 
     <script>
         // --- COMPARISON SLIDER LOGIC ---
-        const container = document.getElementById('comp-container');
-        const slider = document.getElementById('comp-slider');
-        const overlay = document.getElementById('comp-overlay');
-
         function moveSlider(e) {
-            // Get dimensional data
+            // Prevent scrolling on touch
+            if(e.type === 'touchmove') e.preventDefault();
+
+            const container = document.getElementById('compare-box');
+            const beforeImg = document.getElementById('before-img');
+            const handle = document.getElementById('slider-handle');
+
+            // Get container dimensions
             const rect = container.getBoundingClientRect();
-            // Calculate X position relative to container
-            let x = (e.clientX || e.touches[0].clientX) - rect.left;
             
-            // Clamp values (prevent slider going outside)
+            // Calculate X position inside container
+            let x = (e.clientX || e.touches[0].clientX) - rect.left;
+
+            // Clamp (don't go outside the box)
             if (x < 0) x = 0;
             if (x > rect.width) x = rect.width;
 
             // Calculate percentage
-            const percent = (x / rect.width) * 100;
+            const percentage = (x / rect.width) * 100;
 
-            // Apply styles
-            slider.style.left = percent + "%";
-            // Reveal the BEFORE image (Left Side) by clipping
-            // The BEFORE image is on top. If we want Left=Before, Right=After:
-            // We show 0 to X% of the Before Image.
-            overlay.style.clipPath = `polygon(0 0, ${percent}% 0, ${percent}% 100%, 0 100%)`;
-        }
+            // 1. Clip the Top Image (Before)
+            // polygon(0 0, X% 0, X% 100%, 0 100%) means we show the left X% of the image
+            beforeImg.style.clipPath = `polygon(0 0, ${percentage}% 0, ${percentage}% 100%, 0 100%)`;
 
-        // Event Listeners
-        container.addEventListener('mousemove', moveSlider);
-        container.addEventListener('touchmove', moveSlider);
-        // Initial Position
-        overlay.style.clipPath = `polygon(0 0, 50% 0, 50% 100%, 0 100%)`;
-
-        // --- LIGHTBOX LOGIC ---
-        function openLightbox(src) {
-            const lightbox = document.getElementById('lightbox');
-            const lightboxImg = document.getElementById('lightbox-img');
-            lightboxImg.src = src;
-            lightbox.classList.add('active'); 
-            requestAnimationFrame(() => { lightbox.style.opacity = '1'; });
-        }
-
-        function closeLightbox() {
-            const lightbox = document.getElementById('lightbox');
-            lightbox.style.opacity = '0';
-            setTimeout(() => { lightbox.classList.remove('active'); }, 300);
-        }
-
-        // --- INJECTION SEQUENCE ---
-        function startInjection() {
-            const btn = document.querySelector('.btn-primary');
-            const termBox = document.getElementById('terminal');
-            const termLog = document.getElementById('term-log');
-            const menu = document.getElementById('menu-window');
-
-            menu.style.display = 'none';
-            menu.style.opacity = '0';
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> SECURE BOOT...';
-            termBox.style.display = 'block';
-            
-            const logs = [
-                "Initializing RL Environment...",
-                "Obfuscating Memory Signatures...",
-                "<span class='log-ok'>[SECURE]</span> Kernel Hook Established",
-                "Bypassing Easy-AntiCheat...",
-                "Loading Sigma Bot Modules...",
-                "<span class='log-ok'>[SUCCESS]</span> Ring-0 Access Granted.",
-                "Launching GUI..."
-            ];
-
-            let i = 0;
-            termLog.innerHTML = ''; 
-
-            const interval = setInterval(() => {
-                if (i < logs.length) {
-                    const line = document.createElement('div');
-                    line.style.marginBottom = '4px';
-                    line.innerHTML = `> ${logs[i]}`;
-                    termLog.appendChild(line);
-                    termLog.scrollTop = termLog.scrollHeight;
-                    i++;
-                } else {
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        termBox.style.display = 'none';
-                        btn.innerHTML = '<i class="fa-solid fa-check"></i> INJECTED';
-                        showMenu();
-                    }, 500);
-                }
-            }, 350);
-        }
-
-        function showMenu() {
-            const menu = document.getElementById('menu-window');
-            menu.style.display = 'flex';
-            setTimeout(() => { menu.style.opacity = '1'; }, 50);
+            // 2. Move the Handle
+            handle.style.left = `${percentage}%`;
         }
 
         // --- MENU TABS ---
@@ -563,44 +500,19 @@
             }, 100);
         }
 
-        // --- DRAGGABLE LOGIC ---
-        const dragItem = document.getElementById("menu-window");
-        const dragHandle = document.getElementById("drag-handle");
-        let active = false;
-        let currentX, currentY, initialX, initialY;
-        let xOffset = 0, yOffset = 0;
-
-        dragHandle.addEventListener("mousedown", dragStart);
-        document.addEventListener("mouseup", dragEnd);
-        document.addEventListener("mousemove", drag);
-
-        function dragStart(e) {
-            initialX = e.clientX - xOffset;
-            initialY = e.clientY - yOffset;
-            if (e.target === dragHandle || dragHandle.contains(e.target)) {
-                active = true;
-            }
+        // --- LIGHTBOX LOGIC ---
+        function openLightbox(src) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            lightboxImg.src = src;
+            lightbox.classList.add('active'); 
+            requestAnimationFrame(() => { lightbox.style.opacity = '1'; });
         }
 
-        function dragEnd() {
-            initialX = currentX;
-            initialY = currentY;
-            active = false;
-        }
-
-        function drag(e) {
-            if (active) {
-                e.preventDefault();
-                currentX = e.clientX - initialX;
-                currentY = e.clientY - initialY;
-                xOffset = currentX;
-                yOffset = currentY;
-                setTranslate(currentX, currentY, dragItem);
-            }
-        }
-
-        function setTranslate(xPos, yPos, el) {
-            el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.style.opacity = '0';
+            setTimeout(() => { lightbox.classList.remove('active'); }, 300);
         }
     </script>
 </body>
